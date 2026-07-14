@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hijabers AV - Video Viral Terbaru</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; }
+        .video-zoom { overflow: hidden; position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 8px; }
+        .video-zoom iframe { position: absolute; top: -10%; left: -5%; width: 110%; height: 120%; border: 0; }
+        .thumbnail-card { transition: transform 0.2s; }
+        .thumbnail-card:hover { transform: scale(1.03); }
+        .overlay-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); opacity: 0; transition: 0.3s; }
+        .thumbnail-card:hover .overlay-play { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="p-4 border-b border-gray-800 flex justify-between items-center bg-[#111] sticky top-0 z-50">
+        <h1 class="text-2xl font-bold text-[#ff2a5f] cursor-pointer" onclick="location.reload()">Hijabers <span class="text-white">AV</span></h1>
+        <div class="relative w-1/2 md:w-1/3">
+            <input type="text" placeholder="Cari video viral..." class="bg-[#1a1a1a] p-2 pl-4 rounded-full border border-gray-700 w-full focus:outline-none focus:border-[#ff2a5f]">
+        </div>
+    </header>
+
+    <main id="main-content" class="p-4 max-w-7xl mx-auto">
+        <!-- Home Page -->
+        <div id="home-page">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl text-gray-300 font-semibold border-l-4 border-[#ff2a5f] pl-3">Video Terbaru</h2>
+            </div>
+            <div id="video-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+            <div class="mt-10 flex justify-center space-x-2">
+                <button class="px-4 py-2 bg-[#ff2a5f] rounded-lg">1</button>
+                <button class="px-4 py-2 bg-[#1a1a1a] rounded-lg hover:bg-[#222]">2</button>
+                <button class="px-4 py-2 bg-[#1a1a1a] rounded-lg hover:bg-[#222]">3</button>
+                <span class="px-2 py-2">...</span>
+                <button class="px-4 py-2 bg-[#1a1a1a] rounded-lg hover:bg-[#222]">69</button>
+            </div>
+        </div>
+
+        <!-- Player Page -->
+        <div id="player-page" class="hidden flex flex-wrap gap-8">
+            <div class="w-full lg:w-8/12">
+                <div id="video-player" class="video-zoom">
+                    <div id="overlay-play" class="absolute inset-0 flex items-center justify-center cursor-pointer z-20 bg-black/50">
+                        <i class="fas fa-play-circle text-7xl text-[#ff2a5f] hover:text-white transition"></i>
+                    </div>
+                    <div id="iframe-holder"></div>
+                </div>
+                <h2 id="video-title" class="text-2xl font-bold mt-4 text-white"></h2>
+                <div class="flex items-center space-x-4 mt-2 text-gray-400 text-sm">
+                    <span>1.2M View</span>
+                    <span>• 2 Jam yang lalu</span>
+                    <button class="bg-[#222] px-3 py-1 rounded-full hover:bg-[#ff2a5f] transition">Bagikan</button>
+                </div>
+                
+                <!-- Adsterra 320x50 -->
+                <div class="mt-6 p-2 bg-[#111] border border-gray-800 rounded-lg flex justify-center">
+                    <script type="text/javascript"> atOptions = { 'key' : 'cce652e77f77adb1a858ae4414b2a33e', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} }; </script>
+                    <script type="text/javascript" src="https://www.highperformanceformat.com/cce652e77f77adb1a858ae4414b2a33e/invoke.js"></script>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="w-full lg:w-3/12">
+                <div class="mb-6 p-2 bg-[#111] border border-gray-800 rounded-lg flex justify-center">
+                    <script type="text/javascript"> atOptions = { 'key' : 'e9f5142c8bfcaa091f601702ef1f8fba', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} }; </script>
+                    <script type="text/javascript" src="https://www.highperformanceformat.com/e9f5142c8bfcaa091f601702ef1f8fba/invoke.js"></script>
+                </div>
+                <h3 class="font-bold mb-4 text-gray-300">Rekomendasi Lainnya</h3>
+                <div id="related-grid" class="flex flex-col gap-4"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const videos = [
+            { id: 1, title: "Hijab Cantik Main di Kamar", ytId: "jq7tFuPiViA", duration: "12:45" },
+            { id: 2, title: "Gadis Hijab Viral Terbaru", ytId: "zEvPwqpQCec", duration: "08:20" },
+            { id: 3, title: "Aksi Hijabers Manis", ytId: "CGxXEp_Qvbg", duration: "15:30" },
+            { id: 4, title: "Hijabers Hot Banget", ytId: "Cp4F3f6Q4Ow", duration: "10:15" },
+            { id: 5, title: "Viral Hijab Durasi Panjang", ytId: "BnKxxEaHXRw", duration: "18:40" },
+            { id: 6, title: "Hijabers Cantik Mempesona", ytId: "Y8TSPNQWgJU", duration: "09:50" },
+            { id: 7, title: "Aksi Viral Gadis Hijab", ytId: "TunDKjKrWSQ", duration: "11:20" },
+            { id: 8, title: "Hijabers Manis di Sekolah", ytId: "BkHCu5mGGeI", duration: "14:10" },
+            { id: 9, title: "Hot Hijabers Kamar Tidur", ytId: "2QjPkiunuQo", duration: "07:35" },
+            { id: 10, title: "Hijabers Goyang Viral", ytId: "57NvCtMmDMQ", duration: "13:25" },
+            { id: 11, title: "Hijabers Manis Terbaru", ytId: "J2DaJY60fZ0", duration: "16:10" },
+            { id: 12, title: "Gadis Hijab Paling Viral", ytId: "lvlfwaTx_Ks", duration: "10:55" },
+            { id: 13, title: "Cantik Hijabers Hits", ytId: "cVLq11lNjC0", duration: "08:45" },
+            { id: 14, title: "Hijabers Bikin Gagal Fokus", ytId: "mEiWNZdNdfA", duration: "12:30" },
+            { id: 15, title: "Aksi Manis Hijabers Viral", ytId: "2Lz_Sy_qaLA", duration: "09:20" },
+            { id: 16, title: "Hijabers Cantik Banget", ytId: "ZGj0vvHSBZw", duration: "15:05" },
+            { id: 17, title: "Viral Hijabers Manis", ytId: "4D4gi1xaMDc", duration: "11:40" },
+            { id: 18, title: "Hijabers Viral Terbaru", ytId: "mFjTtIUc0M4", duration: "14:20" },
+            { id: 19, title: "Aksi Hijabers Menggoda", ytId: "_MoKsKgqSGY", duration: "07:55" },
+            { id: 20, title: "Cantik Hijabers Viral", ytId: "xBVxy14i3TA", duration: "13:50" },
+            { id: 21, title: "Hijabers Hits Banget", ytId: "MK8qwclLnls", duration: "06:45" },
+            { id: 22, title: "Viral Hijabers Manis", ytId: "Ad72KOi4IOw", duration: "10:30" },
+            { id: 23, title: "Hijabers Memesona Banget", ytId: "qYk9T4Z9Sds", duration: "12:15" },
+            { id: 24, title: "Cantik Hijabers Viral", ytId: "kPZWy93O-f8", duration: "09:40" },
+            { id: 25, title: "Hijabers Viral Terbaru", ytId: "4hDc4gWAfdM", duration: "15:20" },
+            { id: 26, title: "Aksi Hijabers Cantik", ytId: "o98Q5fAv4hI", duration: "08:10" },
+            { id: 27, title: "Hijabers Manis Viral", ytId: "HtS8pUb9jOA", duration: "11:55" },
+            { id: 28, title: "Viral Hijabers Cantik", ytId: "aBAZZibeuao", duration: "13:40" },
+            { id: 29, title: "Cantik Hijabers Hits", ytId: "TeWWUaFoEuU", duration: "10:25" },
+            { id: 30, title: "Hijabers Paling Viral", ytId: "6v_yBQbIk94", duration: "07:20" },
+            { id: 31, title: "Aksi Manis Hijabers", ytId: "XZa8uKs1snk", duration: "14:50" },
+            { id: 32, title: "Hijabers Cantik Viral", ytId: "0dvgwovBpco", duration: "09:10" },
+            { id: 33, title: "Viral Hijabers Terbaru", ytId: "j2CFFl_2LBU", duration: "12:05" },
+            { id: 34, title: "Cantik Hijabers Manis", ytId: "X67LDXqf_NU", duration: "10:40" },
+            { id: 35, title: "Hijabers Viral Banget", ytId: "aOgyBnOkb5Q", duration: "13:30" },
+            { id: 36, title: "Hijabers Manis Banget", ytId: "2eO4eGtyjOk", duration: "15:15" },
+            { id: 37, title: "Viral Hijabers Cantik", ytId: "9IoWjfw3Cg0", duration: "08:50" },
+            { id: 38, title: "Aksi Hijabers Viral", ytId: "bH-fmHwzZC4", duration: "11:25" },
+            { id: 39, title: "Hijabers Hits Banget", ytId: "i76FLHIo5Yk", duration: "07:45" },
+            { id: 40, title: "Viral Hijabers Manis", ytId: "4whamfBflUM", duration: "14:35" },
+            { id: 41, title: "Cantik Hijabers Viral", ytId: "ga1csRaZE8c", duration: "09:55" },
+            { id: 42, title: "Hijabers Viral Terbaru", ytId: "MKSP1lSbB0U", duration: "12:50" },
+            { id: 43, title: "Aksi Hijabers Cantik", ytId: "n-SdVEP6nzo", duration: "10:15" },
+            { id: 44, title: "Hijabers Manis Viral", ytId: "iQF7WxbXBYI", duration: "13:20" },
+            { id: 45, title: "Hijabers Paling Viral", ytId: "qklVBwJlVY0", duration: "08:35" },
+            { id: 46, title: "Cantik Hijabers Viral", ytId: "ynTmeVfAUxU", duration: "15:45" }
+        ];
+
+        function renderHome() {
+            const grid = document.getElementById('video-grid');
+            videos.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'thumbnail-card cursor-pointer';
+                card.innerHTML = `
+                    <div class="relative w-full pb-[56.25%] overflow-hidden rounded-lg">
+                        <img src="https://img.youtube.com/vi/${v.ytId}/mqdefault.jpg" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute bottom-2 right-2 bg-black/80 px-2 py-1 text-xs font-bold">${v.duration}</div>
+                        <div class="overlay-play"><i class="fas fa-play text-white text-3xl"></i></div>
+                    </div>
+                    <p class="mt-2 text-sm font-medium text-gray-200 line-clamp-2">${v.title}</p>
+                    <p class="text-xs text-gray-500">1.2M View</p>
+                `;
+                card.onclick = () => openVideo(v);
+                grid.appendChild(card);
+            });
+        }
+
+        function renderRelated() {
+            const grid = document.getElementById('related-grid');
+            const shuffled = [...videos].sort(() => 0.5 - Math.random()).slice(0, 6);
+            shuffled.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'flex gap-2 cursor-pointer';
+                card.innerHTML = `
+                    <img src="https://img.youtube.com/vi/${v.ytId}/mqdefault.jpg" class="w-24 h-16 rounded object-cover">
+                    <div>
+                        <p class="text-sm font-medium line-clamp-2">${v.title}</p>
+                        <p class="text-xs text-gray-500">1.2M View</p>
+                    </div>
+                `;
+                card.onclick = () => openVideo(v);
+                grid.appendChild(card);
+            });
+        }
+
+        function openVideo(v) {
+            // Smartlink Trigger
+            const smartLinks = [
+                'https://www.effectivecpmnetwork.com/sydpj3q5u?key=0f5917c23cb0762007566201e26c1415',
+                'https://www.effectivecpmnetwork.com/twj9hutb?key=2ae0e63a24397fd53c270ae81a8b019e'
+            ];
+            window.open(smartLinks[Math.floor(Math.random() * smartLinks.length)], '_blank');
+
+            document.getElementById('home-page').classList.add('hidden');
+            document.getElementById('player-page').classList.remove('hidden');
+            document.getElementById('video-title').innerText = v.title;
+            
+            const overlay = document.getElementById('overlay-play');
+            overlay.style.display = 'flex';
+            overlay.onclick = () => {
+                document.getElementById('iframe-holder').innerHTML = `<iframe src="https://www.youtube.com/embed/${v.ytId}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3" allowfullscreen></iframe>`;
+                overlay.style.display = 'none';
+            };
+            window.scrollTo(0, 0);
+        }
+
+        window.onload = () => {
+            renderHome();
+            renderRelated();
+        };
+    </script>
+    <script src="https://pl30361499.effectivecpmnetwork.com/7e/a7/a7/7ea7a7d55edc639eb1419343708f53b5.js"></script>
+</body>
+</html>
