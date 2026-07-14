@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Viral Hot & Trending</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tube: {
+                            dark: '#0f0f11',
+                            card: '#18181b',
+                            accent: '#ff9900',
+                            hover: '#e68a00'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f0f11;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        /* Efek blur untuk background saat popup 18+ aktif */
+        .blur-bg {
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Menyembunyikan scrollbar tapi tetap bisa scroll */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0f11; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff9900; }
+
+        /* Trik untuk mencegah klik judul YouTube agar tidak lari ke aplikasi YT */
+        .yt-container {
+            position: relative;
+        }
+        /* Lapisan transparan memblokir klik pada area judul & logo YouTube */
+        .yt-blocker-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 75%; /* Diubah ke 75% agar menutupi judul saja, membiarkan ikon playlist di kanan atas bisa diklik */
+            height: 65px;
+            background: transparent;
+            z-index: 10;
+        }
+        .yt-blocker-bottom {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100px;
+            height: 50px;
+            background: transparent;
+            z-index: 10;
+        }
+        
+        /* Animasi Transisi Filter */
+        .video-card {
+            transition: all 0.4s ease-in-out;
+            transform: scale(1);
+            opacity: 1;
+        }
+        .video-card.hidden-card {
+            transform: scale(0.8);
+            opacity: 0;
+            display: none;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <div id="age-gate" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-md transition-opacity duration-300">
+        <div class="bg-tube-card border border-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-[90%] text-center transform transition-transform scale-100">
+            <i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-4"></i>
+            <h1 class="text-3xl font-black text-white mb-2">Peringatan 18+</h1>
+            <p class="text-gray-400 mb-8 leading-relaxed">Situs ini berisi konten dewasa yang dibatasi umurnya. Anda harus berusia minimal 18 tahun untuk dapat mengakses halaman ini.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="leaveSite()" class="px-6 py-3 rounded-lg font-bold text-white bg-gray-700 hover:bg-gray-600 transition-colors w-full sm:w-auto">
+                    Keluar
+                </button>
+                <button onclick="enterSite()" class="px-6 py-3 rounded-lg font-bold text-black bg-tube-accent hover:bg-tube-hover transition-colors shadow-[0_0_15px_rgba(255,153,0,0.4)] w-full sm:w-auto">
+                    Saya Setuju & 18+
+                </button>
+            </div>
+            <p class="mt-6 text-xs text-gray-600">Dengan menekan setuju, Anda bertanggung jawab penuh atas kebijakan wilayah Anda.</p>
+        </div>
+    </div>
+
+    <!-- Konten Utama (Akan di-blur sampai tombol 18+ diklik) -->
+    <div id="main-wrapper" class="flex-grow flex flex-col blur-bg transition-all duration-500">
+        
+        <header class="sticky top-0 z-40 bg-tube-dark/95 backdrop-blur-sm border-b border-gray-800 shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Logo -->
+                    <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="filterVideos('all')">
+                        <div class="bg-tube-accent text-black font-black text-xl px-2 py-1 rounded">V</div>
+                        <span class="text-white font-black text-xl tracking-tight">Viral<span class="text-tube-accent">Tube</span></span>
+                    </div>
+                    
+                    <!-- Menu Desktop & Mobile -->
+                    <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto no-scrollbar py-2">
+                        <button onclick="filterVideos('all', this)" class="menu-btn px-3 py-2 rounded-md text-sm font-bold text-tube-accent bg-gray-800 transition-colors whitespace-nowrap">Semua</button>
+                        <button onclick="filterVideos('terbaru', this)" class="menu-btn px-3 py-2 rounded-md text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 transition-colors whitespace-nowrap">Terbaru</button>
+                        <button onclick="filterVideos('viral', this)" class="menu-btn px-3 py-2 rounded-md text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 transition-colors whitespace-nowrap">Viral 🔥</button>
+                        <button onclick="filterVideos('hijabers', this)" class="menu-btn px-3 py-2 rounded-md text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 transition-colors whitespace-nowrap">Hijabers</button>
+                        <button onclick="filterVideos('populer', this)" class="menu-btn px-3 py-2 rounded-md text-sm font-bold text-gray-300 hover:text-white hover:bg-gray-800 transition-colors whitespace-nowrap">Populer</button>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            
+            <!-- Adsterra Banner Atas -->
+            <div class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-4 mb-8 flex justify-center items-center min-h-[90px]">
+                <span class="text-gray-500 text-sm"><i class="fas fa-ad mr-2"></i>Space Iklan Adsterra (Banner Atas)</span>
+                <!-- TEMPEL SCRIPT ADSTERRA DI SINI -->
+            </div>
+
+            <div class="flex justify-between items-end mb-6">
+                <h2 id="section-title" class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-play-circle text-tube-accent mr-3"></i> Menampilkan Semua Video
+                </h2>
+            </div>
+
+            <!-- Video Grid -->
+            <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                
+                <!-- Item 1: Hijabers, Terbaru -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="hijabers terbaru">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PLimkiO2puDhdCygnTyBS800-vHcBx2OdG&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Koleksi Viral Hijabers Terbaru - Vol 1</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 245K</span>
+                            <span class="mx-2">•</span><span><i class="fas fa-thumbs-up mr-1"></i> 98%</span>
+                            <span class="mx-2">•</span><span>Baru saja</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2: Viral, Populer -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="viral populer">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PLimkiO2puDhfSSLcnk45AvA5THm9iYuJh&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Kompilasi Tiktok Indo Hot Viral Paling Dicari</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 890K</span>
+                            <span class="mx-2">•</span><span>1 jam lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 3: Viral -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="viral">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PLimkiO2puDhfTrPpZ06XomQCnCkiRDpsv&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Goyang Viral Pemersatu Bangsa Part 3</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 1.2M</span>
+                            <span class="mx-2">•</span><span>3 jam lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 4: Terbaru -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="terbaru">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PLimkiO2puDhfUt9ilM_jP0_kk8ZRrnb9o&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Live Streaming Bigo & Tiktok Paling Berani</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 500K</span>
+                            <span class="mx-2">•</span><span>5 jam lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 5: Populer, Hijabers -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="populer hijabers">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PLimkiO2puDhdACEcP9aqL0a84pm_P9tGP&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Tante Cantik Goyang FYP Bikin Pusing</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 340K</span>
+                            <span class="mx-2">•</span><span>12 jam lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 6: Viral -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="viral">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PL-7f4ckpa1Cy5LQ-hJVWIU26Mu1666pHx&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Koleksi Pribadi Skandal Baru Tersebar</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 2.1M</span>
+                            <span class="mx-2">•</span><span>1 hari lalu</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Item 7: Hijabers -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="hijabers">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PL-7f4ckpa1CyHKtAbaf79S1wKjjMG8hxj&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Montok & Mulus Hijabers Main Bareng</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 750K</span>
+                            <span class="mx-2">•</span><span>2 hari lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 8: Populer -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="populer">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PL-7f4ckpa1CxaYnrk8VSw61nTTz7aE6_G&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Update Video Asli Tanpa Sensor Terbaru</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 1.5M</span>
+                            <span class="mx-2">•</span><span>3 hari lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 9: Terbaru -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="terbaru">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PL-7f4ckpa1CzECV83LIX7VTkOL0v2Sn_s&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Skandal Tersembunyi Part 1 HD</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 420K</span>
+                            <span class="mx-2">•</span><span>4 hari lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 10: Viral -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="viral">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PL-7f4ckpa1CzNxIQk8jHu9c2ue2-PnOW3&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Kompilasi Desahan Malam Jumat Viral</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 950K</span>
+                            <span class="mx-2">•</span><span>5 hari lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 11: Hijabers -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="hijabers">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PL-7f4ckpa1Cz85kCf6tbrrecw4tnWwDYB&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Ukhti Cantik Main Di Kamar Kos</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 680K</span>
+                            <span class="mx-2">•</span><span>1 minggu lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 12: Populer -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="populer">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PL-7f4ckpa1Czr5G3RoAtC8iWlTLySMvjr&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Goyang Erotis Indo Paling Dicari 2023</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 1.1M</span>
+                            <span class="mx-2">•</span><span>1 minggu lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 13: Terbaru -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="terbaru">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PL-7f4ckpa1CybxahDULousNgUq9Jbv07i&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Bocor! Rekaman Pribadi Selebgram</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 320K</span>
+                            <span class="mx-2">•</span><span>2 minggu lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 14: Viral, Hijabers -->
+                <div class="video-card group bg-tube-card rounded-lg overflow-hidden border border-gray-800 hover:border-gray-600 shadow-lg" data-category="viral hijabers">
+                    <div class="yt-container aspect-video w-full bg-black relative">
+                        <div class="yt-blocker-top"></div>
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube.com/embed/videoseries?list=PL-7f4ckpa1CxAqNSUzwiP9WC7yqnNJ70l&playsinline=1&modestbranding=1&rel=0&showinfo=0" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="yt-blocker-bottom"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-gray-100 font-semibold text-sm line-clamp-2 group-hover:text-tube-accent transition-colors">Jilbab Gemetar Bikin Nambah Durasi</h3>
+                        <div class="mt-2 flex items-center text-xs text-gray-500">
+                            <span class="text-tube-accent"><i class="fas fa-eye mr-1"></i> 800K</span>
+                            <span class="mx-2">•</span><span>2 minggu lalu</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Adsterra Banner Bawah -->
+            <div class="w-full mt-12 bg-gray-800/50 border border-gray-700 rounded-lg p-4 flex justify-center items-center min-h-[90px]">
+                <span class="text-gray-500 text-sm"><i class="fas fa-ad mr-2"></i>Space Iklan Adsterra (Banner Bawah)</span>
+                <!-- TEMPEL SCRIPT ADSTERRA DI SINI -->
+            </div>
+            
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-tube-card border-t border-gray-800 py-8 text-center text-gray-500 text-sm mt-auto">
+            <p>&copy; 2023 ViralTube. All models are 18+ years of age.</p>
+            <div class="mt-2 space-x-4">
+                <a href="#" class="hover:text-tube-accent transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-tube-accent transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-tube-accent transition-colors">2257</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Logika Age Gate (18+)
+        document.addEventListener("DOMContentLoaded", () => {
+            const hasVerified = localStorage.getItem("ageVerified");
+            const ageGate = document.getElementById('age-gate');
+            const mainWrapper = document.getElementById('main-wrapper');
+
+            if (!hasVerified) {
+                // Jangan scroll jika pop-up masih ada
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                ageGate.style.display = 'none';
+                mainWrapper.classList.remove('blur-bg');
+            }
+        });
+
+        function enterSite() {
+            localStorage.setItem("ageVerified", "true");
+            document.body.style.overflow = 'auto'; // Buka akses scroll
+            const ageGate = document.getElementById('age-gate');
+            const mainWrapper = document.getElementById('main-wrapper');
+            
+            ageGate.style.opacity = '0';
+            setTimeout(() => {
+                ageGate.style.display = 'none';
+                mainWrapper.classList.remove('blur-bg');
+            }, 300);
+        }
+
+        function leaveSite() {
+            window.location.href = "https://www.google.com";
+        }
+
+        // Logika Filter Kategori Video
+        function filterVideos(category, buttonElement = null) {
+            const cards = document.querySelectorAll('.video-card');
+            const sectionTitle = document.getElementById('section-title');
+            
+            // Update Title
+            let titleText = "Menampilkan Semua Video";
+            if (category !== 'all') {
+                titleText = "Kategori: " + category.charAt(0).toUpperCase() + category.slice(1);
+            }
+            sectionTitle.innerHTML = `<i class="fas fa-play-circle text-tube-accent mr-3"></i> ${titleText}`;
+
+            // Update Active Menu Styling
+            if(buttonElement) {
+                const buttons = document.querySelectorAll('.menu-btn');
+                buttons.forEach(btn => {
+                    btn.classList.remove('text-tube-accent', 'bg-gray-800');
+                    btn.classList.add('text-gray-300');
+                });
+                buttonElement.classList.add('text-tube-accent', 'bg-gray-800');
+                buttonElement.classList.remove('text-gray-300');
+            }
+
+            // Animasi Filter
+            cards.forEach(card => {
+                const categories = card.getAttribute('data-category');
+                if (category === 'all' || categories.includes(category)) {
+                    card.classList.remove('hidden-card');
+                    setTimeout(() => { card.style.display = 'block'; }, 50);
+                } else {
+                    card.classList.add('hidden-card');
+                    setTimeout(() => { card.style.display = 'none'; }, 400); // Sinkron dgn transisi CSS
+                }
+            });
+        }
+    </script>
+</body>
+</html>
